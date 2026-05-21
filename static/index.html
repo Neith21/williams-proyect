@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Subir imagen a S3</title>
+  <style>
+    body { font-family: sans-serif; display: flex; flex-direction: column;
+           align-items: center; justify-content: center; height: 100vh; gap: 1rem; }
+    img  { border-radius: 8px; max-width: 400px; }
+    button { padding: 8px 20px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Subir imagen a S3</h1>
+  <img id="preview" src="" alt="" style="display:none" />
+  <form id="uploadForm">
+    <label for="image">Selecciona tu imagen</label><br/><br/>
+    <input id="image" type="file" accept="image/*" required />
+    <br/><br/>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const file = document.getElementById("image").files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch("/api/s3", { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (data.success) {
+        const img = document.getElementById("preview");
+        img.src = data.data.url;
+        img.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>
